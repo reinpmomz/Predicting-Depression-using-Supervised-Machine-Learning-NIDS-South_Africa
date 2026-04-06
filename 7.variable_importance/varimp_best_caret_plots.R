@@ -32,40 +32,81 @@ caret_varimp_plot <- sapply(unique(caret_varimp_all_df$analysis_name), function(
     dplyr::arrange(mean_of_rank) %>%
     dplyr::slice(1:2)
   
-  ## Creating a named vector to quickly rename levels
-  new_levels <- selected_vars_df %>%
-    dplyr::select(new_label, new_variable) %>%
-    tidyr::drop_na() %>%
-    dplyr::filter(new_variable %in% names(test2)) %>%
-    tibble::deframe()
+  ## Varimp object attribute
   
-  df <- caret_varimp_all_df %>%
-    dplyr::mutate(variable = as.character(forcats::fct_recode(variable, !!!new_levels))) %>%
+  ## Creating a named vector to quickly rename levels
+  #new_levels <- selected_vars_df %>%
+  #  dplyr::select(new_label, new_variable) %>%
+  #  tidyr::drop_na() %>%
+  #  dplyr::filter(new_variable %in% names(test2)) %>%
+  #  tibble::deframe()
+  
+  #df <- caret_varimp_all_df %>%
+  #  dplyr::mutate(variable = as.character(forcats::fct_recode(variable, !!!new_levels))) %>%
+  #  dplyr::filter(analysis_name == nn, 
+  #                label %in% best_model$label[best_model$analysis_name == nn]) %>%
+  #  #dplyr::arrange(desc(auc)) %>%
+  #  dplyr::mutate(label = forcats::as_factor(label))
+  #
+  #p <- sapply(unique(df$label), function(y){
+  #   plot(df %>% dplyr::filter(analysis_name == nn, label == y)
+  #        , show_boxplots = TRUE
+  #        , bar_width = 3 #default 10
+  #        , desc_sorting = TRUE
+  #        , title = "" #default 'Feature Importance'
+  #        , subtitle = ""
+  #   ) +
+  #    labs(x = "", y = "", title = "") +
+  #    scale_y_continuous(expand = expansion(mult = c(0.01,0.1))
+  #                       ) +
+  #    scale_x_discrete(labels = function(x) stringr::str_wrap(x, width = 65)
+  #                       ) +
+  #    theme(axis.text.y = element_text(angle = 0, lineheight = 0.6, size = 8.5)
+  #          )
+  #    
+  #}, simplify=FALSE)
+  
+  ## Dataframe if varimp object looses its attribute
+  
+  df_new <- caret_varimp_all_df %>%
+    dplyr::left_join(final_attribute %>%
+                       dplyr::select(variable, label) %>%
+                       dplyr::rename(terms = label),
+                     by = c("variable")) %>%
+    dplyr::mutate(terms = ifelse(variable %in% c("time_lag"), "time_lag" , terms)) %>%
+    tidyr::drop_na(terms) %>%
     dplyr::filter(analysis_name == nn, 
                   label %in% best_model$label[best_model$analysis_name == nn]) %>%
-    #dplyr::arrange(desc(auc)) %>%
     dplyr::mutate(label = forcats::as_factor(label))
   
-  p <- sapply(unique(df$label), function(y){
-    plot(df %>% dplyr::filter(analysis_name == nn, label == y)
-         , show_boxplots = TRUE
-         , bar_width = 3 #default 10
-         , desc_sorting = TRUE
-         , title = "" #default 'Feature Importance'
-         , subtitle = ""
-    ) +
-      labs(x = "", y = "", title = "") +
-      scale_y_continuous(expand = expansion(mult = c(0.01,0.1))
+  p <- sapply(unique(df_new$label), function(y){
+    df_new %>% dplyr::filter(analysis_name == nn, label == y) %>%
+      dplyr::group_by(terms, label, analysis, analysis_name) %>%
+      dplyr::summarise(lower = quantile(dropout_loss, probs = 0.025, na.rm = TRUE),
+                       estimate = quantile(dropout_loss, probs = 0.5, na.rm = TRUE),
+                       upper = quantile(dropout_loss, probs = 0.975, na.rm = TRUE), .groups = "drop"
+                       ) %>%
+      dplyr::arrange(desc(estimate)) %>%
+      ggplot(aes(x=estimate, y=forcats::fct_reorder(terms, estimate, .desc = FALSE))) + 
+      geom_col(fill = "dodgerblue3", width = 0.8) +
+      geom_linerange(aes(xmin=lower, xmax=upper), colour="navyblue", size=1.0#, alpha=0.9
+                     ) +
+      labs(x = "", y = "", title = "", subtitle = y) +
+      scale_x_continuous(expand = expansion(mult = c(0.01,0.14))
                          ) +
-      scale_x_discrete(labels = function(x) stringr::str_wrap(x, width = 65)
-                         ) +
-      theme(axis.text.y = element_text(angle = 0, lineheight = 0.6, size = 8.5)
-            )
-      
+      theme_minimal(base_size = 12) +
+      theme(
+        plot.subtitle = element_text(hjust = 0.5),
+        axis.text.y = element_text(size = 8.6),
+        axis.text.x = element_text(size = 8.6),
+        panel.grid.major.y = element_blank(),
+        panel.grid.minor = element_blank()
+      )
+    
   }, simplify=FALSE)
   
   grid <- do.call(gridExtra::grid.arrange, c(p, list(ncol = 2))
-                  )
+                  ) 
   
   annotate_grid <- ggpubr::annotate_figure( 
     grid,
@@ -90,32 +131,73 @@ caret_varimp_best_model_plot <- sapply(unique(best_model_caret_df$analysis_name)
   
   best_model <- best_model_caret_df
   
+  ## Varimp object attribute
+  
   ## Creating a named vector to quickly rename levels
-  new_levels <- selected_vars_df %>%
-    dplyr::select(new_label, new_variable) %>%
-    tidyr::drop_na() %>%
-    dplyr::filter(new_variable %in% names(test2)) %>%
-    tibble::deframe()
+  #new_levels <- selected_vars_df %>%
+  #  dplyr::select(new_label, new_variable) %>%
+  #  tidyr::drop_na() %>%
+  #  dplyr::filter(new_variable %in% names(test2)) %>%
+  #  tibble::deframe()
+  #
+  #df <- caret_varimp_all_df %>%
+  #  dplyr::mutate(variable = as.character(forcats::fct_recode(variable, !!!new_levels))) %>%
+  #  dplyr::filter(analysis_name == nn, 
+  #                label %in% best_model$label[best_model$analysis_name == nn]
+  #              )
+  #
+  #p <- sapply(unique(df$label), function(y){
+  #  plot(df %>% dplyr::filter(analysis_name == nn, label == y)
+  #       , show_boxplots = TRUE
+  #       , bar_width = 3 #default 10
+  #       , desc_sorting = TRUE
+  #       , title = "" #default 'Feature Importance'
+  #       , subtitle = ""
+  #       ) +
+  #    labs(x = "", y = "", title = "") +
+  #    scale_y_continuous(expand = expansion(mult = c(0.01,0.1))) +
+  #    theme(axis.text.y = element_text(angle = 0, lineheight = 0.7, size = 9)
+  #          )
+  #    
+  #}, simplify=FALSE)
   
-  df <- caret_varimp_all_df %>%
-    dplyr::mutate(variable = as.character(forcats::fct_recode(variable, !!!new_levels))) %>%
+  ## Dataframe if varimp object looses its attribute
+  
+  df_new <- caret_varimp_all_df %>%
+    dplyr::left_join(final_attribute %>%
+                       dplyr::select(variable, label) %>%
+                       dplyr::rename(terms = label),
+                     by = c("variable")) %>%
+    dplyr::mutate(terms = ifelse(variable %in% c("time_lag"), "time_lag" , terms)) %>%
+    tidyr::drop_na(terms) %>%
     dplyr::filter(analysis_name == nn, 
-                  label %in% best_model$label[best_model$analysis_name == nn]
-                )
+                  label %in% best_model$label[best_model$analysis_name == nn]) %>%
+    dplyr::mutate(label = forcats::as_factor(label))
   
-  p <- sapply(unique(df$label), function(y){
-    plot(df %>% dplyr::filter(analysis_name == nn, label == y)
-         , show_boxplots = TRUE
-         , bar_width = 3 #default 10
-         , desc_sorting = TRUE
-         , title = "" #default 'Feature Importance'
-         , subtitle = ""
-         ) +
-      labs(x = "", y = "", title = "") +
-      scale_y_continuous(expand = expansion(mult = c(0.01,0.1))) +
-      theme(axis.text.y = element_text(angle = 0, lineheight = 0.7, size = 9)
-            )
-      
+  p <- sapply(unique(df_new$label), function(y){
+    df_new %>% dplyr::filter(analysis_name == nn, label == y) %>%
+      dplyr::group_by(terms, label, analysis, analysis_name) %>%
+      dplyr::summarise(lower = quantile(dropout_loss, probs = 0.025, na.rm = TRUE),
+                       estimate = quantile(dropout_loss, probs = 0.5, na.rm = TRUE),
+                       upper = quantile(dropout_loss, probs = 0.975, na.rm = TRUE), .groups = "drop"
+                       ) %>%
+      dplyr::arrange(desc(estimate)) %>%
+      ggplot(aes(x=estimate, y=forcats::fct_reorder(terms, estimate, .desc = FALSE))) + 
+      geom_col(fill = "dodgerblue3", width = 0.8) +
+      geom_linerange(aes(xmin=lower, xmax=upper), colour="navyblue", size=1.0#, alpha=0.9
+                     ) +
+      labs(x = "", y = "", title = "", subtitle = y) +
+      scale_x_continuous(expand = expansion(mult = c(0.01,0.1))
+                         ) +
+      theme_minimal(base_size = 12) +
+      theme(
+        #plot.subtitle = element_text(hjust = 0.5),
+        axis.text.y = element_text(size = 8.6),
+        axis.text.x = element_text(size = 8.6),
+        panel.grid.major.y = element_blank(),
+        panel.grid.minor.y = element_blank()
+      )
+    
   }, simplify=FALSE)
   
   grid <- do.call(gridExtra::grid.arrange, c(p, list(ncol = 1))

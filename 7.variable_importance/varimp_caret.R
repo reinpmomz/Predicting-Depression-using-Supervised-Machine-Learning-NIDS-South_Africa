@@ -4,7 +4,7 @@ working_directory
 ## Get Variable importance for all models
 
 caret_varimp_df <- sapply(ls(pattern = "_train_caret$"), function(x){
-  nreps <- 10
+  
   modname <- gsub("\\_train_caret", "", x)
   x <- get(x)
   nn <- names(x)

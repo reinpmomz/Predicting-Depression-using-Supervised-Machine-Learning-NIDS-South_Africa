@@ -19,8 +19,14 @@ split2 <- rsample::group_initial_split(df_drop_feature %>% dplyr::arrange(pid)
                                        )
 
 train2 <- training(split2)
-test2 <- testing(split2)
 
+test2 <- testing(split2) %>%
+  dplyr::select(-pid)
+
+## save sample feature dataset
+saveRDS(test2 %>% dplyr::slice_sample(prop = 0.01, by = cesd_depression)
+        , base::file.path(output_Dir, "sample_features.rds")
+        )
 
 ## Create up-sample and Down-sample datasets only on training set based on ratio condition
 if (round(prop.table(table(train2[outcome_vars], useNA = "no")),2)[1] > 0.55 | 

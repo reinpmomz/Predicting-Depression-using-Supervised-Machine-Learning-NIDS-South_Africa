@@ -3,7 +3,7 @@ library(tidyr)
 
 working_directory
 
-caret_top_n <- 10
+caret_top_n <- 5
 caret_total_n <- as.numeric(ncol(test2[, !names(test2) %in% outcome_vars]))
 
 # Mostly frequently identified variables
@@ -15,6 +15,7 @@ caret_varfreq_df <- caret_varimp_all_df %>%
               dplyr::select(variable, label) %>%
               dplyr::rename(terms = label),
             by = c("variable")) %>%
+  dplyr::mutate(terms = ifelse(variable %in% c("time_lag"), "time_lag" , terms)) %>%
   tidyr::drop_na(terms) %>%
   dplyr::group_by(variable, label, analysis, analysis_name, terms) %>%
   dplyr::summarise(overall = mean(dropout_loss, na.rm=TRUE), .groups = "drop") %>%

@@ -46,7 +46,12 @@ model_recipe_caret <- sapply(ls(pattern = "^train2"), function(x){
     step_unknown(all_nominal_predictors()
                  ) 
   
-  recipe_impute_numeric <- recipe_unknown %>%
+  recipe_dummy <- recipe_unknown %>% 
+    step_dummy(all_nominal(), -all_outcomes(), one_hot=FALSE, naming = dummy_extract_names
+               ) #creates a specification that will convert nominal data (e.g. factors) into one or more numeric binary model terms 
+                 #corresponding to the levels of the original data.
+  
+  recipe_impute_numeric <- recipe_dummy %>%
     #creates a specification that will create linear regression models to impute missing data for numeric variables
     # step_impute_linear(all_numeric_predictors()
     #                    , impute_with = all_predictors() 
@@ -57,12 +62,7 @@ model_recipe_caret <- sapply(ls(pattern = "^train2"), function(x){
                     , impute_with = all_predictors() 
                     )
   
-  recipe_dummy <- recipe_impute_numeric %>% 
-    step_dummy(all_nominal(), -all_outcomes(), one_hot=FALSE, naming = dummy_extract_names
-               ) #creates a specification that will convert nominal data (e.g. factors) into one or more numeric binary model terms 
-                 #corresponding to the levels of the original data.
-  
-  recipe_single <- recipe_dummy %>%
+  recipe_single <- recipe_impute_numeric %>%
     step_zv(all_predictors()) %>% #creates a specification that will remove variables that contain only a single value
     step_nzv(all_predictors()) #creates a specification that will remove variables that are highly sparse and unbalanced
   

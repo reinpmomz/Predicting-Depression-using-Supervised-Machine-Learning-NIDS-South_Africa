@@ -23,12 +23,12 @@ base::ifelse(!base::dir.exists(output_plots_Dir), base::dir.create(output_plots_
 ## Install required packages
 
 ### Install CRAN packages
-required_packages <- c("tidyverse", "haven", "janitor", "knitr", "lubridate", "gtsummary",
+required_packages <- c("tidyverse", "haven", "janitor", "knitr", "lubridate", "gtsummary", "flextable", "officer",
                        "survey", "labelled", "sjlabelled", "factoextra", "gridExtra", "ggpubr", "rstatix",
                        "scales", "readxl", "writexl", "data.table", "ggstats", "tibble", "glue", "psych", "checkmate",
                        "caret", "performance", "rsample", "glmnet", "bayestestR", "randomForest", "gbm", "xgboost",
                        "e1071", "naivebayes", "DALEX", "recipes", "ranger", "pls", "kernlab", "mda", "class", "RSNNS",
-                       "cowplot", "corrplot", "tidytext", "earth"
+                       "cowplot", "corrplot", "tidytext", "earth", "shapviz", "kernelshap"
                        )
 
 installed_packages <- required_packages %in% base::rownames(utils::installed.packages())

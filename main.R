@@ -50,6 +50,65 @@ source("./2.load_data_and_clean/analysis_data.R")
 
 ################################################################################
 
+### Descriptive and Inferential stats
+source("./3.statistical_analysis/descriptive_inferential_unweighted_stats.R")
+source("./3.statistical_analysis/descriptive_inferential_weighted_stats.R")
+
+### Effect Size stats
+source("./3.statistical_analysis/effect_size_stats.R")
+
+### reliability and correlation stats for CES-D 
+source("./3.statistical_analysis/reliability_correlation_tools_stats_w1.R")
+source("./3.statistical_analysis/reliability_correlation_tools_stats_w2.R")
+source("./3.statistical_analysis/reliability_correlation_tools_stats_w3.R")
+source("./3.statistical_analysis/reliability_correlation_tools_stats_w4.R")
+source("./3.statistical_analysis/reliability_correlation_tools_stats_w5.R")
+
+### Test-Restest Reliability for CES-D
+source("./3.statistical_analysis/test_retest_reliability_w1_w2.R")
+source("./3.statistical_analysis/test_retest_reliability_w1_w3.R")
+source("./3.statistical_analysis/test_retest_reliability_w1_w4.R")
+source("./3.statistical_analysis/test_retest_reliability_w1_w5.R")
+source("./3.statistical_analysis/test_retest_reliability_w2_w3.R")
+source("./3.statistical_analysis/test_retest_reliability_w2_w4.R")
+source("./3.statistical_analysis/test_retest_reliability_w2_w5.R")
+source("./3.statistical_analysis/test_retest_reliability_w3_w4.R")
+source("./3.statistical_analysis/test_retest_reliability_w3_w5.R")
+source("./3.statistical_analysis/test_retest_reliability_w4_w5.R")
+
+### Save stats output
+source("./3.statistical_analysis/save_descriptive_inferential_unweighted_output.R")
+source("./3.statistical_analysis/save_descriptive_inferential_weighted_output.R")
+source("./3.statistical_analysis/save_effect_size_output.R")
+source("./3.statistical_analysis/save_reliability_correlation_tools_output_w1.R")
+source("./3.statistical_analysis/save_reliability_correlation_tools_output_w2.R")
+source("./3.statistical_analysis/save_reliability_correlation_tools_output_w3.R")
+source("./3.statistical_analysis/save_reliability_correlation_tools_output_w4.R")
+source("./3.statistical_analysis/save_reliability_correlation_tools_output_w5.R")
+source("./3.statistical_analysis/save_test_retest_reliability_output_w1_w2.R")
+source("./3.statistical_analysis/save_test_retest_reliability_output_w1_w3.R")
+source("./3.statistical_analysis/save_test_retest_reliability_output_w1_w4.R")
+source("./3.statistical_analysis/save_test_retest_reliability_output_w1_w5.R")
+source("./3.statistical_analysis/save_test_retest_reliability_output_w2_w3.R")
+source("./3.statistical_analysis/save_test_retest_reliability_output_w2_w4.R")
+source("./3.statistical_analysis/save_test_retest_reliability_output_w2_w5.R")
+source("./3.statistical_analysis/save_test_retest_reliability_output_w3_w4.R")
+source("./3.statistical_analysis/save_test_retest_reliability_output_w3_w5.R")
+source("./3.statistical_analysis/save_test_retest_reliability_output_w4_w5.R")
+
+### Descriptive plots per wave
+source("./3.statistical_analysis/descriptive_plots.R")
+
+### Cumulative Proportion of rounds per individuals
+source("./3.statistical_analysis/proportion_rounds_plots.R")
+
+### Proportion of Depression per wave and overall
+source("./3.statistical_analysis/proportion_line_plots.R")
+
+source("./3.statistical_analysis/proportion_sf_plots.R")
+
+################################################################################
+
 ## Model preparation
 
 ### Select variables required for modelling and model formula
@@ -149,6 +208,16 @@ source("./7.variable_importance/varimp_rank_caret_plots.R")
 
 source("./7.variable_importance/varimp_rank_all_plots.R")
 
+################################################################################
+
+## SHAP (SHapley Additive exPlanations)
+source("./8.shap/shapfuns_caret.R")
+source("./8.shap/shap_best_caret_plots.R")
+
+################################################################################
+
+## Deployment via MLOps (Machine Learning Operations)
+source("./9.deployment/vetiver_best_model.R")
 
 ################################################################################
 
@@ -165,13 +234,21 @@ save(list = ls(all.names = TRUE)[ls(all.names = TRUE) %in% c("logistic_train_car
                                                              "lda_train_caret", "lda_train_caret_times",
                                                              "mlp_train_caret", "mlp_train_caret_times",
                                                              "caret_metrics_df", "caret_metrics_all_df",
-                                                             "caret_roc_df", "caret_roc_all_df",
-                                                             "caret_varimp_df", "caret_varimp_all_df"
+                                                             "caret_roc_df", "caret_roc_all_df", "test2",
+                                                             "caret_varimp_df", "caret_varimp_all_df",
+                                                             "best_model_caret_df", "outcome_vars",
+                                                             "positive_class"
                                                               )],
      file = "nids_train_models.RData",
      envir = .GlobalEnv #parent.frame()
      )
 
+save(list = ls(all.names = TRUE)[ls(all.names = TRUE) %in% c("caret_shap_best_raw", "caret_shap_best",
+                                                             "shap_feature_names"
+                                                              )],
+     file = "nids_shap_plot.RData",
+     envir = .GlobalEnv #parent.frame()
+     )
 
 ################################################################################
 

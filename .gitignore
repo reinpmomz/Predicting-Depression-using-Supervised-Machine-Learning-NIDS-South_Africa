@@ -1,11 +1,12 @@
 # Rhistory
-.Rhistory
+*.Rhistory
 
 # Rdata files
 *.RData
 
 # rds files
 *.rds
+!Output/*.rds
 
 # sav files
 *.sav

@@ -100,12 +100,15 @@ correlation_tools_stats_w1 <- if (length(unique(selected_vars_df$tool_correlatio
            index <- selected_vars_df$new_variable[selected_vars_df$tool_correlation == nn 
                                                   & !is.na(selected_vars_df$tool_correlation)]
            
+           index_all <- selected_vars_df$new_variable[selected_vars_df$tool_correlation != "none"
+                                                      & !is.na(selected_vars_df$tool_correlation)]
+           
            correlation <- df_analysis %>%
              filter(wave_id == "w1") %>%
-             dplyr::select(any_of(index)) %>%
+             dplyr::select(any_of(index_all)) %>%
              rstatix::cor_test(
-               vars = NULL,
-               vars2 = NULL
+               vars = index,
+               vars2 = index_all
                ) %>%
              left_join(final_attribute %>%
                          dplyr::select(variable, label),

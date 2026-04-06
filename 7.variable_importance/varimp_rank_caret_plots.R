@@ -14,7 +14,7 @@ caret_varfreq_plot <- sapply(unique(caret_varfreq_df$analysis_name), function(x)
     geom_tile(color="black") +
     scale_fill_distiller(palette = "Greens", direction=1) +
     scale_y_discrete(expand=c(0,0)
-                     ,labels = function(x) stringr::str_wrap(x, width = 37)
+                     ,labels = function(x) stringr::str_wrap(x, width = 50)
     ) +
     scale_x_continuous(
       breaks=function(x){1:max(x)}

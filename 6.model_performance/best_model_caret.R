@@ -67,3 +67,7 @@ writexl::write_xlsx(list( best_overall_model_analysis = caret_best_model_analysi
                     path = base::file.path(output_Dir, "best_model_caret.xlsx" )
                     )
 
+## save best model
+saveRDS(get(paste0(best_model_caret_df$label,"_train_caret"))[[paste0(best_model_caret_df$analysis)]]
+        , base::file.path(output_Dir, "best_model_caret.rds")
+        )
