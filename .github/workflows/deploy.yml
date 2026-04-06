@@ -43,7 +43,7 @@ jobs:
           git config --local user.email "actions@github.com"
           git config --local user.name "GitHub Actions"
           git add Dockerfile plumber.R vetiver_renv.lock ./9.deployment/model_board/
-          git commit -m 'Data updated' || echo "No changes to commit"
+          git commit -m 'Vetiver files updated' || echo "No changes to commit"
           git push origin || echo "No changes to commit"
         env:
           REPO_KEY: ${{secrets.GITHUB_TOKEN}}
