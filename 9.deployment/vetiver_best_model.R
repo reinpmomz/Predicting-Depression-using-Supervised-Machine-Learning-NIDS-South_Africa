@@ -33,6 +33,9 @@ vetiver::vetiver_pin_write(board, v)
 vetiver::vetiver_prepare_docker(
   board,
   "depression-southafrica",
-  path = "."
+  path = ".",
+  docker_args = list(rspm = FALSE)
+  
 )
+
 
