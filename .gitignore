@@ -5,8 +5,7 @@
 *.RData
 
 # rds files
-*.rds
-!Output/*.rds
+!*.rds
 
 # sav files
 *.sav
