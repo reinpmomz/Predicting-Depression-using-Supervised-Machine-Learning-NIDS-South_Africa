@@ -22,7 +22,7 @@ v <- vetiver::vetiver_model(model = best_model
 #  plumber::pr_run(port = 8080)
 
 # 4. Version model locally for deployment
-board <- pins::board_folder("./9.deployment/model_board"
+board <- pins::board_folder("model_board"
                                   , versioned = TRUE
                                   )
 
@@ -37,5 +37,4 @@ vetiver::vetiver_prepare_docker(
   docker_args = list(rspm = FALSE)
   
 )
-
 

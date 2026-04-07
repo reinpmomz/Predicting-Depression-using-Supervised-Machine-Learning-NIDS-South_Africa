@@ -4,8 +4,8 @@ library(pins)
 library(plumber)
 library(rapidoc)
 library(vetiver)
-b <- board_folder(path = "9.deployment/model_board")
-v <- vetiver_pin_read(b, "depression-southafrica", version = "20260406T190225Z-aa0a9")
+b <- board_folder(path = "model_board")
+v <- vetiver_pin_read(b, "depression-southafrica", version = "20260407T034854Z-aa0a9")
 
 #* @plumber
 function(pr) {
