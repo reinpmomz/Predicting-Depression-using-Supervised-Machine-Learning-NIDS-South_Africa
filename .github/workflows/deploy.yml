@@ -6,6 +6,8 @@ on:
     branches: [ "main" ]
     paths:
       - "Output/best_model_caret.rds"
+permissions:
+  contents: write   #REQUIRED for pushing changes
 
 jobs:
   build-and-deploy:
