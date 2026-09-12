@@ -234,7 +234,7 @@ df_clean <- df_merged_final %>%
                 , adult_height = round(rowMeans(across(c(a_height_1:a_height_3)), na.rm = TRUE)/100
                                      ,2
                                      ) #creating average height in meters for adults
-                , adult_weight = round(rowMeans(across(c(a_weight_1:a_weight_1)), na.rm = TRUE)
+                , adult_weight = round(rowMeans(across(c(a_weight_1:a_weight_3)), na.rm = TRUE)
                                        ,1
                                        ) #creating average weight in Kgs for adults
                 , adult_bmi = round(adult_weight/((adult_height)^2)
