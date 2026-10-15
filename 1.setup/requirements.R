@@ -28,7 +28,8 @@ required_packages <- c("tidyverse", "haven", "janitor", "knitr", "lubridate", "g
                        "scales", "readxl", "writexl", "data.table", "ggstats", "tibble", "glue", "psych", "checkmate",
                        "caret", "performance", "rsample", "glmnet", "bayestestR", "randomForest", "gbm", "xgboost",
                        "e1071", "naivebayes", "DALEX", "recipes", "ranger", "pls", "kernlab", "mda", "class", "RSNNS",
-                       "cowplot", "corrplot", "tidytext", "earth", "shapviz", "kernelshap"
+                       "cowplot", "corrplot", "tidytext", "earth", "shapviz", "kernelshap", "sf",
+                       "vetiver", "pins", "plumber"
                        )
 
 installed_packages <- required_packages %in% base::rownames(utils::installed.packages())
