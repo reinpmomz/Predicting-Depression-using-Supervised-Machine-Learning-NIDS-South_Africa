@@ -49,7 +49,15 @@ caret_shap_best_bar_plot <- caret_shap_best %>%
                          , max_display = Inf #20L
                          , sort_features = TRUE
                          ) +
-  theme(axis.text = element_text(size = 9))
+  theme_minimal(base_size = 12) +
+  theme(axis.text = element_text(size = 9),
+        panel.grid.major.y = element_blank(),
+        panel.grid.minor.y = element_blank(),
+        panel.grid.minor.x = element_blank()
+        ) +
+  scale_x_continuous(expand = expansion(mult = c(0.005,0.05))
+                     , n.breaks = 10
+                     )
 
 print(caret_shap_best_bar_plot)
 
