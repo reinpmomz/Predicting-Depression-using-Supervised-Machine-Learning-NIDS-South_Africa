@@ -26,7 +26,8 @@ colnames(caret_shap_best[["S"]]) <- shap_feature_names
 caret_shap_best[["X"]] <- sjlabelled::label_to_colnames(caret_shap_best[["X"]]) 
 
 ## Plot SHAP values
-caret_shap_best_plot <- caret_shap_best %>%
+### Bee plot
+caret_shap_best_bee_plot <- caret_shap_best %>%
   shapviz::sv_importance(kind = "beeswarm"
                          , bee_width = 0.3
                          , bee_adjust = 0.5
@@ -35,11 +36,31 @@ caret_shap_best_plot <- caret_shap_best %>%
                          ) +
   theme(axis.text = element_text(size = 9))
 
-print(caret_shap_best_plot)
+print(caret_shap_best_bee_plot)
+
+
+### Bar Plot
+caret_shap_best_bar_plot <- caret_shap_best %>%
+  shapviz::sv_importance(kind = "bar" #default
+                         , fill = "dodgerblue3" #"#fca50a"
+                         , bar_width = 2/3
+                         , show_numbers = FALSE
+                         , number_size = 3.2
+                         , max_display = Inf #20L
+                         , sort_features = TRUE
+                         ) +
+  theme(axis.text = element_text(size = 9))
+
+print(caret_shap_best_bar_plot)
 
 ### Saving SHAP plot for best model
-ggsave(plot=caret_shap_best_plot, height = 7, width = 10.5,
-       filename = paste0("caret_shap_best_model_plot_",best_model_caret_df$label,"_",best_model_caret_df$analysis_name,".png"),
+ggsave(plot=caret_shap_best_bee_plot, height = 7, width = 10.5,
+       filename = paste0("caret_shap_best_model_bee_plot_",best_model_caret_df$label,"_",best_model_caret_df$analysis_name,".png"),
        path = output_plots_Dir, bg='white'
        )  
+
+ggsave(plot=caret_shap_best_bar_plot, height = 7, width = 10.5,
+       filename = paste0("caret_shap_best_model_bar_plot_",best_model_caret_df$label,"_",best_model_caret_df$analysis_name,".png"),
+       path = output_plots_Dir, bg='white'
+       )
 
