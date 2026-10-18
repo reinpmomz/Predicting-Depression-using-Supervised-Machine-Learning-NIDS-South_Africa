@@ -223,6 +223,12 @@ source("./9.deployment/vetiver_best_model.R")
 
 ## Save workspace at the end without working directory path
 
+save(list = ls(all.names = TRUE)[ls(all.names = TRUE) %in% c("df_final", "df_analysis"
+                                                              )],
+     file = "nids_df.RData",
+     envir = .GlobalEnv #parent.frame()
+     )
+
 save(list = ls(all.names = TRUE)[ls(all.names = TRUE) %in% c("logistic_train_caret", "logistic_train_caret_times",
                                                              "lasso_train_caret", "lasso_train_caret_times",
                                                              "ridge_train_caret", "ridge_train_caret_times",

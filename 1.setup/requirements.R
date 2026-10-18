@@ -28,7 +28,7 @@ required_packages <- c("tidyverse", "haven", "janitor", "knitr", "lubridate", "g
                        "scales", "readxl", "writexl", "data.table", "ggstats", "tibble", "glue", "psych", "checkmate",
                        "caret", "performance", "rsample", "glmnet", "bayestestR", "randomForest", "gbm", "xgboost",
                        "e1071", "naivebayes", "DALEX", "recipes", "ranger", "pls", "kernlab", "mda", "class", "RSNNS",
-                       "cowplot", "corrplot", "tidytext", "earth", "shapviz", "kernelshap", "sf",
+                       "cowplot", "corrplot", "tidytext", "earth", "shapviz", "kernelshap", "sf", "nestedcv",
                        "vetiver", "pins", "plumber"
                        )
 

@@ -1,5 +1,6 @@
 library(dplyr)
 library(readr)
+library(nestedcv)
 library(caret)
 library(rstatix)
 library(corrplot)
@@ -10,16 +11,27 @@ library(corrplot)
 ### drop highly correlated predictor variables
 
 #### correlation matrix by pearson method
-correlation_x <- cor(df_drop_vars %>%
-                       dplyr::select(-any_of(c(outcome_vars)), -pid) %>%
-                       dplyr::mutate(across(where(~ !is.numeric(.x)), ~as.numeric(.x)) ),
-                     method="pearson", use = "pairwise.complete.obs")
+correlation_x <- cor(nestedcv::one_hot(df_drop_vars %>%
+                                           dplyr::select(-any_of(c(outcome_vars)), -pid, -wave_id) 
+                                         , all_levels = TRUE
+                                         ) 
+                     , method="pearson"
+                     , use = "pairwise.complete.obs" #"na.or.complete", "everything", "all.obs", "complete.obs"
+                     )
+
+#"epilepsy", "h_freqvio", "sight_hearing_speech_problem"
 
 #### numeric value for the pair-wise absolute correlation cutoff
 hc = caret::findCorrelation(correlation_x, cutoff = corr_threshold, names = TRUE)
 
-#### we sort the elements
-hc = sort(hc)
+#### we extract the colnames sort the elements
+hc = sort(sub("\\..*", "", hc))
+
+hc <- hc[!hc %in% 
+           c("a_relnb", "best_race", "geo2001", "h_freqdomvio", "hiv_aids", "physically_handicapped", "ses_index")]
+
+hc <- c(hc, "epilepsy", "h_freqvio")
+
 
 #### delete the elements that has the correlation greater than threshold
 
@@ -39,15 +51,27 @@ print(drop_corr_report)
 
 ### drop low associated predictor variables with outcome variable - effect size
 
-effect_size_x <- effectsize_corr_table(df = df_drop_corr %>%
-                                         dplyr::select(-pid) %>%
-                                         dplyr::mutate(across(c(any_of(outcome_vars)),~forcats::fct_relevel(.x, "Yes"))
-                                         )
-                                       , by_vars = outcome_vars
-                                       , par_effsize = TRUE
-                                       , var_equal = FALSE
-                                       , par_cor = TRUE
-                                       )[[outcome_vars]] %>%
+effect_size_x <- sapply(as.character(unique(df_drop_corr$wave_id)), function(x) {
+  nn <- x
+  
+  df_new <- df_drop_corr %>%
+    dplyr::filter(wave_id == nn)
+  
+  out <- effectsize_corr_table(df = df_new %>%
+                                 dplyr::select(-pid, - wave_id) %>%
+                                 dplyr::mutate(across(c(any_of(outcome_vars)),~forcats::fct_relevel(.x, "Yes"))
+                                               )
+                               , by_vars = outcome_vars
+                               , par_effsize = TRUE
+                               , var_equal = FALSE
+                               , par_cor = TRUE
+                               )
+  
+}, simplify = TRUE 
+) %>%
+  dplyr::bind_rows() %>%
+  dplyr::group_by(outcome, type, variables, label) %>%
+  dplyr::summarise(effsize = mean(effsize, na.rm = TRUE)) %>%
   dplyr::mutate(effsize_new = abs(round(effsize, 3))
                 ) %>%
   dplyr::filter(effsize_new > effectsize_threshold) %>%
@@ -64,7 +88,7 @@ effect_size_x <- effectsize_corr_table(df = df_drop_corr %>%
 #   dplyr::pull(var2)
 
 df_drop_feature <- df_drop_corr %>%
-  dplyr::select(pid, any_of(c(outcome_vars, effect_size_x))
+  dplyr::select(pid, wave_id, any_of(c(outcome_vars, effect_size_x))
                 ) %>%
   dplyr::arrange( wave_id )%>%
   dplyr::mutate(wave_id = readr::parse_number(as.character(wave_id))) %>%
@@ -85,4 +109,10 @@ drop_feature_report <- paste0(
 )
 
 print(drop_feature_report)
+
+
+## save sample feature dataset
+saveRDS(df_drop_feature %>% dplyr::slice_sample(prop = 0.01, by = cesd_depression)
+        , base::file.path(output_Dir, "sample_features.rds")
+        )
 
