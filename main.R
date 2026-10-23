@@ -27,6 +27,8 @@ source("./1.setup/helperfuns_ggplot_themes.R")
 source("./1.setup/helperfuns_stack_plots.R")
 source("./1.setup/helperfuns_effect_size.R")
 source("./1.setup/helperfuns_coallesce_columns.R")
+source("./1.setup/helperfuns_gt_summary_themes.R")
+source("./1.setup/helperfuns_table_summary_categorical.R")
 
 ################################################################################
 
@@ -53,6 +55,7 @@ source("./2.load_data_and_clean/analysis_data.R")
 ### Descriptive and Inferential stats
 source("./3.statistical_analysis/descriptive_inferential_unweighted_stats.R")
 source("./3.statistical_analysis/descriptive_inferential_weighted_stats.R")
+source("./3.statistical_analysis/prevalence_stats.R")
 
 ### Effect Size stats
 source("./3.statistical_analysis/effect_size_stats.R")
@@ -79,6 +82,7 @@ source("./3.statistical_analysis/test_retest_reliability_w4_w5.R")
 ### Save stats output
 source("./3.statistical_analysis/save_descriptive_inferential_unweighted_output.R")
 source("./3.statistical_analysis/save_descriptive_inferential_weighted_output.R")
+source("./3.statistical_analysis/save_prevalence_output.R")
 source("./3.statistical_analysis/save_effect_size_output.R")
 source("./3.statistical_analysis/save_reliability_correlation_tools_output_w1.R")
 source("./3.statistical_analysis/save_reliability_correlation_tools_output_w2.R")

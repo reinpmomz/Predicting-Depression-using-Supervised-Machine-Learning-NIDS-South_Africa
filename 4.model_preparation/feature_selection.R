@@ -1,6 +1,7 @@
 library(dplyr)
 library(readr)
 library(nestedcv)
+library(tibble)
 library(caret)
 library(rstatix)
 library(corrplot)
@@ -9,7 +10,6 @@ library(corrplot)
 ## Feature Selection
 
 ### drop highly correlated predictor variables
-
 #### correlation matrix by pearson method
 correlation_x <- cor(nestedcv::one_hot(df_drop_vars %>%
                                            dplyr::select(-any_of(c(outcome_vars)), -pid, -wave_id) 
@@ -49,12 +49,55 @@ drop_corr_report <- paste0(
 )
 print(drop_corr_report)
 
-### drop low associated predictor variables with outcome variable - effect size
+### VIF - Invert the correlation matrix and extract the diagonal elements
+# you can exploit a fundamental mathematical property of linear algebra: 
+# the diagonal elements of an inverted correlation matrix are the exact VIF values
 
-effect_size_x <- sapply(as.character(unique(df_drop_corr$wave_id)), function(x) {
+correlation_vif_x <- cor(nestedcv::one_hot(df_drop_corr %>%
+                                           dplyr::select(-any_of(c(outcome_vars)), -pid, -wave_id)
+                                           , all_levels = FALSE
+                                           ) 
+                         , method="pearson"
+                         , use = "pairwise.complete.obs" #"na.or.complete", "everything", "all.obs", "complete.obs"
+                         )
+
+vif_x <- data.frame(vif = diag(solve(correlation_vif_x))
+                    ) %>%
+  tibble::rownames_to_column(var = "one_hot") %>%
+  dplyr::mutate(variable = sub("\\..*", "", one_hot)) %>%
+  dplyr::filter(vif > vif_threshold) 
+
+
+mc <- vif_x %>%
+  dplyr::distinct(variable) %>%
+  dplyr::pull(variable)
+
+mc <- mc[!mc %in% 
+           c("ses_index", "a_relnb", "h_freqdrug", "a_fwbrelinc", "physically_handicapped")]
+  
+
+#### delete the multicollinear variables
+
+if (length(mc)==0) {
+  df_drop_vif <- df_drop_corr
+} else { df_drop_vif <- df_drop_corr %>%
+  dplyr::select(-any_of(c(mc)))
+}
+
+drop_vif_report <- paste0(
+  paste0(names(df_drop_corr)[!(names(df_drop_corr) %in% names(df_drop_vif))],
+         collapse=", ")," ", 
+  length(names(df_drop_corr)[!(names(df_drop_corr) %in% names(df_drop_vif))])
+  , " dropped multicollinear variables" , ", ", ncol(df_drop_vif), " Final variables for feature selection"
+)
+print(drop_vif_report)
+
+### Redundant variables - drop low associated predictor variables with outcome variable - effect size
+
+effect_size_x <- sapply(as.character(unique(df_drop_vif$wave_id)), function(x) {
   nn <- x
   
-  df_new <- df_drop_corr %>%
+  df_new <- df_drop_vif %>%
     dplyr::filter(wave_id == nn)
   
   out <- effectsize_corr_table(df = df_new %>%
@@ -77,17 +120,8 @@ effect_size_x <- sapply(as.character(unique(df_drop_corr$wave_id)), function(x) 
   dplyr::filter(effsize_new > effectsize_threshold) %>%
   dplyr::pull(variables)
 
-# effect_size_x <- df_drop_corr %>%
-#   dplyr::select(-pid) %>%
-#   dplyr::mutate(across(where(~ !is.numeric(.x)), ~as.numeric(.x)) ) %>%
-#                rstatix::cor_test(
-#                  vars = any_of(outcome_vars),
-#                  vars2 = NULL
-#                  ) %>%
-#   dplyr::filter(p < 0.05) %>%
-#   dplyr::pull(var2)
 
-df_drop_feature <- df_drop_corr %>%
+df_drop_feature <- df_drop_vif %>%
   dplyr::select(pid, wave_id, any_of(c(outcome_vars, effect_size_x))
                 ) %>%
   dplyr::arrange( wave_id )%>%
@@ -100,9 +134,9 @@ df_drop_feature <- df_drop_corr %>%
   dplyr::select(-wave_id)
 
 drop_feature_report <- paste0(
-  paste0(names(df_drop_corr)[!(names(df_drop_corr) %in% names(df_drop_feature))],
+  paste0(names(df_drop_vif)[!(names(df_drop_vif) %in% names(df_drop_feature))],
          collapse=", ")," ", 
-  length(names(df_drop_corr)[!(names(df_drop_corr) %in% names(df_drop_feature))])
+  length(names(df_drop_vif)[!(names(df_drop_vif) %in% names(df_drop_feature))])
   , " dropped lowly associated predictor variables with outcome variable" , ", ", ncol(df_drop_feature),
   " Final variables (including outcome) for modelling", ". ", nrow(df_drop_corr)-nrow(df_drop_feature) , 
   " repeated rows omitted.", " Final rows ", nrow(df_drop_feature)

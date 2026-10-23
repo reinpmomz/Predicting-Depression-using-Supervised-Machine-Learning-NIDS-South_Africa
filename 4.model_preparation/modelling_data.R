@@ -33,6 +33,9 @@ corr_threshold <- model_params_df$corr_threshold
 ## effectsize cutoff
 effectsize_threshold <- model_params_df$effect_size_threshold
 
+## vif cutoff
+vif_threshold <- model_params_df$vif_threshold
+
 ## folds
 nfolds <- model_params_df$folds
 
