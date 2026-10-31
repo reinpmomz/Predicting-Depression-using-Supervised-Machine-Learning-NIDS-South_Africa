@@ -183,6 +183,9 @@ bootstrap_samples <- 25 #set default is 50
 source("./6.model_performance/resamples_test_data_metrics_caret.R")
 source("./6.model_performance/resamples_test_data_roc_caret.R")
 
+### Friedman and Post-hoc pairwise tests to compare sampling techniques
+source("./6.model_performance/comparison_model_metrics_caret.R")
+
 ### Accuracy, Sensitivity(Recall/True positive rate), AUC, F1, Precision(PPV)
 source("./6.model_performance/metrics_caret_plots.R")
 
@@ -247,7 +250,9 @@ save(list = ls(all.names = TRUE)[ls(all.names = TRUE) %in% c("logistic_train_car
                                                              "caret_roc_df", "caret_roc_all_df", "test2",
                                                              "caret_varimp_df", "caret_varimp_all_df",
                                                              "best_model_caret_df", "outcome_vars",
-                                                             "positive_class"
+                                                             "positive_class", "friedman_test_metrics_df", 
+                                                             "friedman_test_all_df", "pairwilcox_test_metrics_df",
+                                                             "pairwilcox_test_metrics_all_df"
                                                               )],
      file = "nids_train_models.RData",
      envir = .GlobalEnv #parent.frame()
